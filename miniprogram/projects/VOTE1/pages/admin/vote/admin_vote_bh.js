@@ -2,6 +2,7 @@ const pageHelper = require('../../../../../helper/page_helper.js');
 const cloudHelper = require('../../../../../helper/cloud_helper.js');
 const projectSetting = require('../../../public/project_setting.js');
 const setting = require('../../../../../setting/setting.js');
+const dataHelper = require('../../../../../helper/data_helper.js');
 
 module.exports = Behavior({
 	data: {
@@ -97,6 +98,51 @@ module.exports = Behavior({
 			this.setData({
 				formItem
 			});
+		},
+
+		bindForms: async function (event) {
+			let liveForm = event.detail.data.forms.find(item => item.mark == "live");
+			if (liveForm && liveForm.val) {
+				let room = dataHelper.genRandomString(64);
+
+				let liveUrlForm = event.detail.data.forms.find(item => item.mark == "live_url");
+				let liveUrlField = event.detail.data.fields.find(item => item.mark == "live_url");
+				if (liveUrlForm && liveUrlField) {
+					liveUrlField.val = liveUrlForm.val = `http://${setting.LIVE_SERVER_ADDR}:7001/live/${room}.flv`;
+				}
+
+				let livePushUrlForm = event.detail.data.forms.find(item => item.mark == "live_push_url");
+				let livePushUrlField = event.detail.data.fields.find(item => item.mark == "live_push_url");
+				if (livePushUrlForm && livePushUrlField) {
+					livePushUrlField.val = livePushUrlForm.val = `rtmp://${setting.LIVE_SERVER_ADDR}:1935/live/`;
+				}
+
+				wx.request({
+					url: `http://${setting.LIVE_SERVER_ADDR}:8090/control/get?room=${room}`,
+					success: (result) => {
+						if (result.statusCode != 200) {
+							return;
+						}
+
+						let data = result.data;
+						if (data.status != 200) {
+							return;
+						}
+
+						let livePushCodeForm = event.detail.data.forms.find(item => item.mark == "live_push_code");
+						let livePushCodeField = event.detail.data.fields.find(item => item.mark == "live_push_code");
+						if (livePushCodeForm && livePushCodeField) {
+							livePushCodeField.val = livePushCodeForm.val = data.data;
+						}
+
+						event.detail.setData({
+							forms: event.detail.data.forms,
+							fields: event.detail.data.fields
+						});
+					}
+				});
+				
+			}
 		},
 
 	}

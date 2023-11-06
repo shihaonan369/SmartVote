@@ -25,7 +25,7 @@ class AdminVoteController extends BaseProjectAdminController {
 		let input = this.validateData(rules);
 
 		let service = new AdminVoteService();
-		await service.statVoteAll(input.id);
+		service.statVoteAll(input.id);
 	}
 
 	/** 置顶与排序设定 */
@@ -57,7 +57,7 @@ class AdminVoteController extends BaseProjectAdminController {
 		let input = this.validateData(rules);
 
 		let service = new AdminVoteService();
-		await service.vouchVote(input.id, input.vouch);
+		return await service.vouchVote(input.id, input.vouch);
 	}
 
 	/** 状态修改 */

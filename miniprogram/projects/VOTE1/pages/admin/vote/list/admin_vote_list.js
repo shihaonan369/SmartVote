@@ -199,6 +199,7 @@ Page({
 
 		let id = pageHelper.dataset(e, 'id');
 		let vouch = pageHelper.dataset(e, 'vouch');
+		console.log(vouch)
 		if (!id) return;
 
 		let params = {

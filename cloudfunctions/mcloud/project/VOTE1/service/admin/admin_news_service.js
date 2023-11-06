@@ -60,9 +60,17 @@ class AdminNewsService extends BaseProjectAdminService {
 		id,
 		content // 富文本数组
 	}) {
+		// 获取数据库里的图片数据
+		let news = await NewsModel.getOne(id, 'NEWS_CONTENT');
 
-		this.AppError('该功能暂不开放，如有需要请加作者微信：cclinux0730');
+		// 处理 新旧文件
+		content = await cloudUtil.handlerCloudFilesByRichEditor(news.NEWS_CONTENT, content);
 
+		//更新数据库
+		let data = {
+			NEWS_CONTENT: content
+		};
+		await NewsModel.edit(id, data);
 	}
 
 	/**
@@ -73,9 +81,17 @@ class AdminNewsService extends BaseProjectAdminService {
 		id,
 		imgList // 图片数组
 	}) {
+		// 获取数据库里的图片数据
+		let news = await NewsModel.getOne(id, 'NEWS_PIC');
 
-		this.AppError('该功能暂不开放，如有需要请加作者微信：cclinux0730');
+		// 处理 新旧文件
+		let picList = await cloudUtil.handlerCloudFiles(news.NEWS_PIC, imgList);
 
+		//更新数据库
+		let data = {
+			NEWS_PIC: picList
+		};
+		await NewsModel.edit(id, data);
 	}
 
 
@@ -88,8 +104,14 @@ class AdminNewsService extends BaseProjectAdminService {
 		order,
 		desc = '',
 	}) {
+		let data = {};
+		data.NEWS_TITLE = title;
+		data.NEWS_CATE_ID = cateId;
+		data.NEWS_CATE_NAME = cateName;
+		data.NEWS_ORDER = order;
+		data.NEWS_DESC = dataUtil.fmtText(desc, 100);
 
-		this.AppError('该功能暂不开放，如有需要请加作者微信：cclinux0730');
+		await NewsModel.edit(id, data);
 	}
 
 	/**取得资讯分页列表 */

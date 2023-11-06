@@ -53,6 +53,7 @@
 					<view bindtap="bindShowTap" data-view="order" class="{{showView=='order'?'cur':''}}">按序号</view>
 					<view bindtap="bindShowTap" data-view="rank" class="{{showView=='rank'?'cur':''}}">按票数</view>
 					<view bindtap="bindShowTap" data-view="desc" class="{{showView=='desc'?'cur':''}}">简介须知</view>
+					<view bindtap="bindShowTap" data-view="live" class="{{showView=='live'?'cur':''}}">直播</view>
 				</view>
 			</view>
 
@@ -116,6 +117,12 @@
 					</view>
 				</view>
 				<!--图文END-->
+
+				<!--直播begin-->
+				<view wx:if="{{showView=='live'}}" class="article-box">
+					<view bindtap="bindLiveTap" class="search-btn">直播</view>
+				</view>
+				<!--直播end-->
 			</view>
 		</view>
 

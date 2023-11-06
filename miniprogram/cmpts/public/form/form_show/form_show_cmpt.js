@@ -119,7 +119,7 @@ Component({
 				fields,
 				isLoad: true
 			});
-			//this.triggerEvent('forms', newForms);
+			this.triggerEvent('forms', this);
 		},
 
 		// 根据mark和type获取上次值或者缓存值或者缺省值
@@ -304,7 +304,7 @@ Component({
 				[fieldsName]: val,
 			});
 
-			//this.triggerEvent('forms', forms);
+			this.triggerEvent('forms', this);
 		},
 
 

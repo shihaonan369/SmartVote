@@ -45,6 +45,10 @@ module.exports = {
 	VOTE_FIELDS: [
 		{ mark: 'cover', title: '封面图片', type: 'image', min: 1, max: 1, must: true },
 		{ mark: 'desc', title: '投票简介与须知', type: 'content', must: false },
+		{ mark: 'live', title: '直播', type: 'switch', must: false, def: false },
+		{ mark: 'live_url', title: '直播地址', type: 'text', must: false },
+		{ mark: 'live_push_url', title: '直播推流地址', type: 'text', must: false },
+		{ mark: 'live_push_code', title: '直播推流码', type: 'text', must: false }
 	],
 
 }

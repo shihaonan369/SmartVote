@@ -1,6 +1,6 @@
 module.exports = {
 	//### 环境相关 
-	CLOUD_ID: 'init-5go8b8pdc98ea814', //云服务id ,本地测试环境 
+	CLOUD_ID: 'smartvote-8gqwfd8o62143f49', //云服务id ,本地测试环境 
 
 	// #### 版本信息 
 	VER: 'Vote build 2022.07.26',
@@ -19,5 +19,8 @@ module.exports = {
 	// #### 缓存相关
 	CACHE_IS_LIST: true, //列表是否缓存
 	CACHE_LIST_TIME: 60 * 30, //列表缓存时间秒    
+
+	// ### 直播服务器地址
+	LIVE_SERVER_ADDR: '127.0.0.1'
 
 }

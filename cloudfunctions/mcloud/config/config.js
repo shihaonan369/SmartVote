@@ -1,7 +1,7 @@
 module.exports = {
 
 	//### 环境相关 
-	CLOUD_ID: 'init-5go8b8pdc98ea814', //你的云环境id   
+	CLOUD_ID: 'smartvote-8gqwfd8o62143f49', //你的云环境id   
 
 	// ##################################################################   
 	COLLECTION_PRFIX: 'bx_',
@@ -19,4 +19,5 @@ module.exports = {
 
 	// ### 后台业务相关
 	ADMIN_LOGIN_EXPIRE: 86400, //管理员token过期时间 (秒) 
+
 }

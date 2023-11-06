@@ -104,7 +104,7 @@
 </view>
 
 <view class="form-box shadow margin-top-xs">
-	<cmpt-form-show id="cmpt-form" mark="cmpt-form" source="admin" isCacheMatch="{{false}}" fields="{{fields}}" forms="{{formForms}}" isDefMatch="{{id?false:true}}">
+	<cmpt-form-show id="cmpt-form" mark="cmpt-form" source="admin" isCacheMatch="{{false}}" fields="{{fields}}" forms="{{formForms}}" isDefMatch="{{id?false:true}}" bind:forms="bindForms">
 	</cmpt-form-show>
 </view>
 

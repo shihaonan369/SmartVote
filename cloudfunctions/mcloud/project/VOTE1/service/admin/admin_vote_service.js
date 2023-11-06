@@ -14,6 +14,11 @@ const VoteJoinModel = require('../../model/vote_join_model.js');
 const cloudUtil = require('../../../../framework/cloud/cloud_util.js');
 const timeUtil = require('../../../../framework/utils/time_util.js');
 const dataUtil = require('../../../../framework/utils/data_util.js');
+const cloudBase = require('../../../../framework/cloud/cloud_base.js');
+const { max } = require('../../../../framework/database/model.js');
+const cloud = cloudBase.getCloud();
+const db = cloud.database();
+const _ = db.command;
 
 // 导出投票数据KEY
 const EXPORT_VOTE_DATA_KEY = 'EXPORT_VOTE_DATA';
@@ -22,13 +27,27 @@ class AdminVoteService extends BaseProjectAdminService {
 
 	// 按项目统计
 	async statVoteAll(voteId) {
-		this.AppError('该功能暂不开放，如有需要请加作者微信：cclinux0730'); 
-	}
+		let where = {
+			VOTE_JOIN_VOTE_ID: voteId
+		}
+		let count = await VoteJoinModel.count(where)
+		let userCount = await VoteJoinModel.distinctCnt(where, 'VOTE_JOIN_USER_ID')
+		let groupCount = await VoteJoinModel.groupCount(where, 'VOTE_JOIN_IDX')
+		Object.keys(groupCount).forEach(async k => {
+			let voteJoinIndex = k.replace('VOTE_JOIN_IDX_', '')
+			await VoteModel.edit({
+				_id: voteId
+			}, {
+				[`VOTE_ITEM.${voteJoinIndex}.cnt`]: groupCount[k]
+			})
+		})
 
-
-	/** 推荐首页SETUP */
-	async vouchVoteSetup(id, vouch) {
-		this.AppError('该功能暂不开放，如有需要请加作者微信：cclinux0730');
+		await VoteModel.edit({
+			_id: voteId,
+		}, {
+			VOTE_CNT: count,
+			VOTE_USER_CNT: userCount
+		})
 	}
 
 	/**取得分页列表 */
@@ -114,12 +133,35 @@ class AdminVoteService extends BaseProjectAdminService {
 
 	/**置顶与排序设定 */
 	async sortVote(id, sort) {
-		this.AppError('该功能暂不开放，如有需要请加作者微信：cclinux0730');
+		let where = {
+			_id: id
+		}
+		let data = {
+			VOTE_ORDER: sort
+		}
+
+		await VoteModel.edit(where, data)
 	}
 
 	/**首页设定 */
 	async vouchVote(id, vouch) {
-		this.AppError('该功能暂不开放，如有需要请加作者微信：cclinux0730');
+		let where = {}
+		let orderBy = {
+			'VOTE_VOUCH': 'desc'
+		}
+		let lastVouch = 0
+		let lastVote = await VoteModel.getOne(where, '*', orderBy)
+		if (lastVote != null) {
+			lastVouch = lastVote.VOTE_VOUCH
+		}
+
+		where = {
+			_id: id
+		}
+		let data = {
+			VOTE_VOUCH: (vouch == 0) ? (lastVouch + 1) : 0
+		}
+		await VoteModel.edit(where, data)
 	}
 
 	/**添加 */
@@ -138,8 +180,25 @@ class AdminVoteService extends BaseProjectAdminService {
 		item,
 		forms
 	}) {
+		let data = {}
+		data.VOTE_TITLE = title
+		data.VOTE_CATE_ID = cateId
+		data.VOTE_CATE_NAME = cateName
+		data.VOTE_ORDER = order
+		data.VOTE_START = timeUtil.time2Timestamp(start)
+		data.VOTE_END = timeUtil.time2Timestamp(end)
+		data.VOTE_THEME = theme
+		data.VOTE_IS_REG = isReg
+		data.VOTE_SHOW_START = showStart
+		data.VOTE_TYPE = type
+		data.VOTE_MAX_CNT = maxCnt
+		data.VOTE_ITEM = item
+		data.VOTE_FORMS = forms
 
-		this.AppError('该功能暂不开放，如有需要请加作者微信：cclinux0730');
+		let id = await VoteModel.insert(data)
+		return {
+			id: id
+		}
 	}
 
 	/**获取信息 */
@@ -175,7 +234,24 @@ class AdminVoteService extends BaseProjectAdminService {
 		id,
 		hasImageForms
 	}) {
-		this.AppError('该功能暂不开放，如有需要请加作者微信：cclinux0730');
+		// 获取数据库里的图片数据
+		let vote = await VoteModel.getOne(id, 'VOTE_FORMS');
+
+		// 处理 新旧文件
+		await cloudUtil.handlerCloudFiles([vote.VOTE_FORMS.pic], [hasImageForms.pic]);
+
+		//更新数据库
+		let data = {
+			VOTE_FORMS: hasImageForms
+		}
+		let cover = hasImageForms.find(v => v.mark == 'cover')
+		if (cover) {
+			data.VOTE_OBJ = {
+				cover: cover.val,
+				desc: ''
+			}
+		}
+		await VoteModel.edit(id, data);
 	}
 
 
@@ -196,20 +272,75 @@ class AdminVoteService extends BaseProjectAdminService {
 		item,
 		forms
 	}) {
+		let data = {};
+		data.VOTE_TITLE = title
+		data.VOTE_CATE_ID = cateId
+		data.VOTE_CATE_NAME = cateName
+		data.VOTE_ORDER = order
+		data.VOTE_START = timeUtil.time2Timestamp(start)
+		data.VOTE_END = timeUtil.time2Timestamp(end)
+		data.VOTE_THEME = theme
+		data.VOTE_IS_REG = isReg
+		data.VOTE_SHOW_START = showStart
+		data.VOTE_TYPE = type
+		data.VOTE_MAX_CNT = maxCnt
+		data.VOTE_ITEM = item
+		data.VOTE_FORMS = forms
 
-		this.AppError('该功能暂不开放，如有需要请加作者微信：cclinux0730');
+		await VoteModel.edit(id, data);
 	}
 
 	/**修改状态 */
 	async statusVote(id, status) {
-		this.AppError('该功能暂不开放，如有需要请加作者微信：cclinux0730');
+		let where = {
+			_id: id
+		}
+		let vote = await VoteModel.getOne(where)
+		if (!vote) {
+			this.AppError("投票不存在")
+		}
+
+		let timestamp = this._timestamp
+		let data = {
+			VOTE_STATUS: status
+		}
+
+		await VoteModel.edit(where, data)
+
+		let statusDesc = '';
+		switch (status) {
+			case 0:
+			statusDesc = '已停用'
+			break
+			case vote.VOTE_START > timestamp:
+			statusDesc = '未开始'
+			break
+			case vote.VOTE_END <= timestamp:
+			statusDesc = '已截止'
+			break
+			default:
+			statusDesc =  '进行中'
+		}
+
+		return {
+			statusDesc: statusDesc
+		}
 	}
 
 
 	//#############################   
 	/** 取消某项目的投票记录 */
 	async clearVoteAll(voteId) {
-		this.AppError('该功能暂不开放，如有需要请加作者微信：cclinux0730'); 
+		await VoteModel.edit({
+			_id: voteId
+		}, {
+			'VOTE_ITEM.$[].cnt': 0,
+			'VOTE_USER_CNT': 0,
+			'VOTE_CNT': 0
+		})
+		await VoteJoinModel.del({
+			VOTE_JOIN_VOTE_ID: voteId
+		})
 	}
 
 
@@ -228,8 +359,18 @@ class AdminVoteService extends BaseProjectAdminService {
 	/**导出投票数据 */
 	async exportVoteDataExcel(stat) { 
 
-		this.AppError('该功能暂不开放，如有需要请加作者微信：cclinux0730');
+		this.AppError('该功能暂未开放');
 
+	}
+
+	/**删除投票 */
+	async delVote(id) {
+		await VoteModel.del({
+			_id: id
+		})
+		await VoteJoinModel.del({
+			VOTE_JOIN_VOTE_ID: id
+		})
 	}
 }
 

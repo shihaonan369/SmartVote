@@ -39,6 +39,7 @@ class AdminHomeService extends BaseProjectAdminService {
 	/**添加首页推荐 */
 	async updateHomeVouch({ type, ext, title, id, desc, pic }) {
 		this.AppError('该功能暂不开放，如有需要请加作者微信：cclinux0730'); 
+		
 	}  
 
 	/**删除推荐数据 */

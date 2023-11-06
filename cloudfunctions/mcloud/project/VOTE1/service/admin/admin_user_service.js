@@ -12,6 +12,7 @@ const timeUtil = require('../../../../framework/utils/time_util.js');
 const dataUtil = require('../../../../framework/utils/data_util.js');
 const UserModel = require('../../model/user_model.js');
 const AdminHomeService = require('./admin_home_service.js');
+const VoteJoinModel = require('../../model/vote_join_model.js');
 
 // 导出用户数据KEY
 const EXPORT_USER_DATA_KEY = 'EXPORT_USER_DATA';
@@ -101,8 +102,7 @@ class AdminUserService extends BaseProjectAdminService {
 			USER_MINI_OPENID: id
 		}
 
-		this.AppError('该功能暂不开放，如有需要请加作者微信：cclinux0730');
-
+		await UserModel.del(whereUser)
 	}
 
 	// #####################导出用户数据
