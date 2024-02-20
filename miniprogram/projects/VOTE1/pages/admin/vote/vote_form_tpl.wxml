@@ -78,6 +78,19 @@
 	</view>
 	<view wx:if="{{formMaxCntFocus}}" class="hint-desc error">{{formMaxCntFocus}}</view>
 
+	<view class="form-group">
+		<view class="title must">直播</view>
+		<switch checked="{{formLive}}" bindchange="bindLiveSwitchChange"/>
+		<view wx:if="{{formLive}}">
+			<view class="title must">直播地址</view>
+			<input placeholder="填写直播地址" type="text" placeholder-class="phc" model:value="{{formLiveUrl}}" maxlength="512"></input>
+			<view class="title must">直播推流地址</view>
+			<input placeholder="填写直播推流地址" type="text" placeholder-class="phc" model:value="{{formLivePushUrl}}" maxlength="512"></input>
+			<view class="title must">直播推流码</view>
+			<input placeholder="填写直播推流码" type="text" placeholder-class="phc" model:value="{{formLivePushCode}}" maxlength="512"></input>
+		</view>
+	</view>
+
 	<view class="form-group" id="formVoteItem">
 		<view class="title must">投票选项配置 <text class="text-normal text-grey margin-left-s">(现有{{formItem.length}}项)</text></view>
 	</view>

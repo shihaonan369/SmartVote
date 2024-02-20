@@ -57,6 +57,10 @@ AdminVoteBiz.CHECK_FORM = {
 	theme: 'formTheme|must|int|name=主题色',
 	type: 'formType|must|int|name=投票模式',
 	maxCnt: 'formMaxCnt|must|int|name=可投票数',
+	live: 'formLive|must|bool|name=直播',
+	liveUrl: 'formLiveUrl|string|name=直播地址',
+	livePushUrl: 'formLivePushUrl|string|name=直播推流地址',
+	livePushCode: 'formLivePushCode|string|name=直播推流码',
 	item: 'formItem|must|array|name=投票选项',
 	forms: 'formForms|array'
 };

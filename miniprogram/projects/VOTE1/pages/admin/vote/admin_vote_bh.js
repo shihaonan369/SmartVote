@@ -100,7 +100,7 @@ module.exports = Behavior({
 			});
 		},
 
-		bindForms: async function (event) {
+		bindAddItemTap: async function (event) {
 			let liveForm = event.detail.data.forms.find(item => item.mark == "live");
 			if (liveForm && liveForm.val) {
 				let room = dataHelper.genRandomString(64);

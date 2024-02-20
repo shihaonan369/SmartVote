@@ -1,0 +1,47 @@
+<html>
+    <header>
+        <title>Flv.js</title>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+    </header>
+    <body>
+        <!-- 返回小程序按钮 -->
+        <button onclick="wx.miniProgram.navigateBack()">返回小程序</button>
+        <br/>
+        <video id="videoElement" controls autoplay></video>
+        <!-- flv.js -->
+        <script src="https://cdn.bootcss.com/flv.js/1.5.0/flv.min.js"></script>
+        <!-- hls.js -->
+        <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+        <script>
+            window.addEventListener('popstate', function(e) {
+                wx.miniProgram.navigateBack();
+            });
+
+            var videoElement = document.getElementById('videoElement');
+            var urlParams = new URLSearchParams(window.location.search);
+            var videoUrl = urlParams.get('videoUrl');
+
+            if (videoUrl.endsWith('.flv') && flvjs.isSupported()) {
+                var flvPlayer = flvjs.createPlayer({
+                    type: 'flv',
+                    url: videoUrl,
+                    isLive: true,
+                    hasAudio: false,
+                    hasVideo: true,
+                    muted: true
+                });
+                flvPlayer.attachMediaElement(videoElement);
+                flvPlayer.load();
+                flvPlayer.play();
+            } else if (videoUrl.endsWith('.m3u8') && Hls.isSupported()) {
+                var hls = new Hls();
+                hls.loadSource(videoUrl);
+                hls.attachMedia(videoElement);
+                hls.on(Hls.Events.MANIFEST_PARSED, function() {
+                    videoElement.play();
+                });
+            }
+        </script>
+    </body>
+</html>
